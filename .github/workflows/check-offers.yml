@@ -1,5 +1,35 @@
 name: Sprawdzaj oferty co godzinę
+
 on:
   schedule:
     - cron: '0 * * * *'
-...
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobierz repozytorium
+        uses: actions/checkout@v4
+
+      - name: Zainstaluj Pythona
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Zainstaluj zależności
+        run: pip install -r requirements.txt
+
+      - name: Sprawdź oferty
+        run: python car_tracker.py
+
+      - name: Zapisz wyniki z powrotem do repozytorium
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dashboard.html tracker.xlsx tracker.log
+          git commit -m "Automatyczna aktualizacja ofert $(date -u +'%Y-%m-%d %H:%M UTC')" || echo "Brak zmian, pomijam commit"
+          git push
