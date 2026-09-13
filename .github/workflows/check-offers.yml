@@ -1,5 +1,3 @@
-File name: check-offers.yml
-Language: 
 name: Sprawdzaj oferty co godzinę
 on:
   schedule:
